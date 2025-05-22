@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班系統</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .auth-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 2px;
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .week-button-header {
+            background: #FF9800;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .week-button {
+            background: #fff3e0;
+            border: 1px solid #FF9800;
+            min-height: 80px;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .week-button:hover {
+            background: #ffe0b2;
+        }
+        
+        .week-button button {
+            background: #FF9800;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+        
+        .week-button button:hover {
+            background: #F57C00;
+        }
+        
+        .calendar-day {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            min-height: 80px;
+            padding: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background: #e8f5e8;
+        }
+        
+        .calendar-day.occupied {
+            background: #ffcdd2;
+        }
+        
+        .calendar-day.my-shift {
+            background: #c8e6c9;
+        }
+        
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .shift-info {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .controls button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #45a049;
+        }
+        
+        .month-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .month-navigation button {
+            padding: 10px 15px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .month-navigation button:hover {
+            background: #1976D2;
+        }
+        
+        .current-month {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+        
+        .success {
+            color: green;
+            margin-top: 10px;
+        }
+        
+        input[type="email"], input[type="password"] {
+            width: 200px;
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .primary-button {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .primary-button:hover {
+            background: #45a049;
+        }
+        
+        .secondary-button {
+            background: #f44336;
+            color: white;
+        }
+        
+        .secondary-button:hover {
+            background: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🗓️ 排班系統</h1>
+        <p>點擊日期來新增或刪除您的班次</p>
+    </div>
+
+    <!-- 登入/註冊區域 -->
+    <div id="auth-section" class="auth-section">
+        <h3>請先登入或註冊</h3>
+        <div>
+            <input type="email" id="email" placeholder="電子郵件">
+            <input type="password" id="password" placeholder="密碼">
+        </div>
+        <div>
+            <button class="primary-button" onclick="signIn()">登入</button>
+            <button class="primary-button" onclick="signUp()">註冊</button>
+        </div>
+        <div id="auth-message"></div>
+    </div>
+
+    <!-- 主要功能區域 -->
+    <div id="main-section" class="calendar-section hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div>
+                <span>歡迎，</span><span id="user-email"></span>
+                <button class="secondary-button" onclick="signOut()">登出</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button onclick="clearMyMonthlyShifts()">清除我這個月的所有班次</button>
+        </div>
+
+        <div class="month-navigation">
+            <button onclick="previousMonth()">« 上個月</button>
+            <div class="current-month" id="current-month"></div>
+            <button onclick="nextMonth()">下個月 »</button>
+        </div>
+
+        <div class="calendar" id="calendar">
+            <!-- 日曆標題 -->
+            <div class="week-button-header">排班</div>
+            <div class="calendar-header">一</div>
+            <div class="calendar-header">二</div>
+            <div class="calendar-header">三</div>
+            <div class="calendar-header">四</div>
+            <div class="calendar-header">五</div>
+            <div class="calendar-header">六</div>
+            <div class="calendar-header">日</div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // TODO: 請將下面的 firebaseConfig 替換成您從 Firebase 控制台取得的配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcX1hjA9_qyb6kYgYbQaRblwFrXdW-hWo",
+            authDomain: "mchplainfilmschedule.firebaseapp.com",
+            projectId: "mchplainfilmschedule",
+            storageBucket: "mchplainfilmschedule.firebasestorage.app",
+            messagingSenderId: "104675634969",
+            appId: "1:104675634969:web:3816e35be9d4a551415f88",
+            measurementId: "G-5T31DSRENK"
+        };
+
+        // 導入 Firebase 功能
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, query, where, getDocs, deleteDoc, doc, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // 全域變數
+        let currentDate = new Date();
+        let currentUser = null;
+        let shiftsData = [];
+
+        // 監聽認證狀態變化
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('main-section').classList.remove('hidden');
+                document.getElementById('user-email').textContent = user.email;
+                loadShifts();
+            } else {
+                currentUser = null;
+                document.getElementById('auth-section').classList.remove('hidden');
+                document.getElementById('main-section').classList.add('hidden');
+            }
+        });
+
+        // 註冊功能
+        window.signUp = async function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('auth-message');
+            
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                messageDiv.innerHTML = '<div class="success">註冊成功！</div>';
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">註冊失敗：' + error.message + '</div>';
+            }
+        };
+
+        // 登入功能
+        window.signIn = async function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('auth-message');
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                messageDiv.innerHTML = '<div class="success">登入成功！</div>';
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">登入失敗：' + error.message + '</div>';
+            }
+        };
+
+        // 登出功能
+        window.signOut = async function() {
+            try {
+                await firebaseSignOut(auth);
+            } catch (error) {
+                console.error('登出失敗：', error);
+            }
+        };
+
+        // 載入班表數據
+        async function loadShifts() {
+            try {
+                const shiftsRef = collection(db, 'shifts');
+                const q = query(shiftsRef, orderBy('date'));
+                const querySnapshot = await getDocs(q);
+                
+                shiftsData = [];
+                querySnapshot.forEach((doc) => {
+                    shiftsData.push({ id: doc.id, ...doc.data() });
+                });
+                
+                renderCalendar();
+            } catch (error) {
+                console.error('載入班表失敗：', error);
+            }
+        }
+
+        // 新增班次
+        async function addShift(dateStr) {
+            try {
+                await addDoc(collection(db, 'shifts'), {
+                    date: dateStr,
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    timestamp: new Date()
+                });
+                loadShifts();
+            } catch (error) {
+                console.error('新增班次失敗：', error);
+                alert('新增班次失敗：' + error.message);
+            }
+        }
+
+        // 刪除班次
+        async function removeShift(shiftId) {
+            try {
+                await deleteDoc(doc(db, 'shifts', shiftId));
+                loadShifts();
+            } catch (error) {
+                console.error('刪除班次失敗：', error);
+                alert('刪除班次失敗：' + error.message);
+            }
+        }
+
+        // 渲染日曆
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            
+            // 更新月份標題
+            document.getElementById('current-month').textContent = 
+                currentDate.getFullYear() + '年 ' + monthNames[currentDate.getMonth()];
+            
+            // 清除現有的日期（保留標題）
+            const existingElements = calendar.querySelectorAll('.calendar-day, .week-button');
+            existingElements.forEach(element => element.remove());
+            
+            // 計算月份的第一天
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            
+            // 找到這個月第一個週一
+            const startDate = new Date(firstDay);
+            const dayOfWeek = firstDay.getDay(); // 0=週日, 1=週一, ..., 6=週六
+            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 週日的話要減6天才到週一
+            startDate.setDate(firstDay.getDate() - daysToSubtract);
+            
+            // 生成6週的日曆
+            for (let week = 0; week < 6; week++) {
+                // 創建週的開始日期（週一）
+                const weekStartDate = new Date(startDate);
+                weekStartDate.setDate(startDate.getDate() + (week * 7));
+                
+                // 添加週按鈕
+                const weekButton = document.createElement('div');
+                weekButton.className = 'week-button';
+                
+                const button = document.createElement('button');
+                button.textContent = '填滿整週';
+                button.onclick = () => fillWeekFromDate(weekStartDate);
+                
+                weekButton.appendChild(button);
+                calendar.appendChild(weekButton);
+                
+                // 添加這週的7天（週一到週日）
+                for (let day = 0; day < 7; day++) {
+                    const date = new Date(weekStartDate);
+                    date.setDate(weekStartDate.getDate() + day);
+                    
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'day-number';
+                    dayNumber.textContent = date.getDate();
+                    
+                    const shiftInfo = document.createElement('div');
+                    shiftInfo.className = 'shift-info';
+                    
+                    // 檢查這一天是否有班次
+                    const dateStr = date.toISOString().split('T')[0];
+                    const dayShift = shiftsData.find(shift => shift.date === dateStr);
+                    
+                    if (dayShift) {
+                        shiftInfo.textContent = dayShift.userEmail.split('@')[0];
+                        if (dayShift.userId === currentUser.uid) {
+                            dayElement.classList.add('my-shift');
+                        } else {
+                            dayElement.classList.add('occupied');
+                        }
+                    }
+                    
+                    // 如果不是當前月份，設為灰色
+                    if (date.getMonth() !== currentDate.getMonth()) {
+                        dayElement.style.opacity = '0.3';
+                    }
+                    
+                    // 週末（週六、週日）可以用不同顏色區別
+                    if (day === 5 || day === 6) { // 週六、週日
+                        dayElement.style.backgroundColor = '#f0f8ff';
+                    }
+                    
+                    // 點擊事件
+                    dayElement.addEventListener('click', () => handleDayClick(dateStr, dayShift));
+                    
+                    dayElement.appendChild(dayNumber);
+                    dayElement.appendChild(shiftInfo);
+                    calendar.appendChild(dayElement);
+                }
+            }
+        }
+
+        // 處理日期點擊
+        function handleDayClick(dateStr, existingShift) {
+            if (existingShift) {
+                if (existingShift.userId === currentUser.uid) {
+                    // 刪除自己的班次
+                    if (confirm('確定要刪除這個班次嗎？')) {
+                        removeShift(existingShift.id);
+                    }
+                } else {
+                    alert('這天已經有其他人排班了！');
+                }
+            } else {
+                // 新增班次
+                addShift(dateStr);
+            }
+        }
+
+        // 上個月
+        window.previousMonth = function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        };
+
+        // 下個月
+        window.nextMonth = function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        };
+
+        // 填滿指定週
+        async function fillWeekFromDate(startDate) {
+            console.log('開始填滿週:', startDate); // 除錯用
+            
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                console.log('檢查日期:', dateStr); // 除錯用
+                
+                // 檢查這天是否已經有人排班
+                const existingShift = shiftsData.find(shift => shift.date === dateStr);
+                if (!existingShift) {
+                    console.log('新增班次:', dateStr); // 除錯用
+                    try {
+                        await addShift(dateStr);
+                        // 加入小延遲，避免同時發送太多請求
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (error) {
+                        console.error('新增班次失敗:', dateStr, error);
+                    }
+                } else {
+                    console.log('已有人排班:', dateStr, existingShift.userEmail); // 除錯用
+                }
+            }
+            
+            alert('填滿整週完成！');
+        }
+
+        // 填滿這週（舊功能，保留以防萬一）
+        window.fillWeek = async function() {
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay()); // 週日為起始
+            
+            await fillWeekFromDate(startOfWeek);
+        };
+
+        // 清除我這個月的所有班次
+        window.clearMyMonthlyShifts = async function() {
+            const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+            const currentMonthName = currentDate.getFullYear() + '年 ' + monthNames[currentDate.getMonth()];
+            
+            if (confirm(`確定要清除您在 ${currentMonthName} 的所有班次嗎？`)) {
+                // 計算當月的日期範圍
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                const startOfMonth = new Date(year, month, 1);
+                const endOfMonth = new Date(year, month + 1, 0);
+                
+                const startDateStr = startOfMonth.toISOString().split('T')[0];
+                const endDateStr = endOfMonth.toISOString().split('T')[0];
+                
+                console.log(`清除 ${startDateStr} 到 ${endDateStr} 的班次`);
+                
+                // 找出這個月我的所有班次
+                const myMonthlyShifts = shiftsData.filter(shift => 
+                    shift.userId === currentUser.uid && 
+                    shift.date >= startDateStr && 
+                    shift.date <= endDateStr
+                );
+                
+                console.log('找到班次數量:', myMonthlyShifts.length);
+                
+                if (myMonthlyShifts.length === 0) {
+                    alert('您在這個月沒有排班記錄。');
+                    return;
+                }
+                
+                // 逐一刪除
+                for (const shift of myMonthlyShifts) {
+                    try {
+                        await removeShift(shift.id);
+                        // 加入小延遲避免請求過於頻繁
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (error) {
+                        console.error('刪除班次失敗:', shift.date, error);
+                    }
+                }
+                
+                alert(`已清除 ${myMonthlyShifts.length} 個班次！`);
+            }
+        };
+
+        // 初始化
+        renderCalendar();
+    </script>
+</body>
+</html>
