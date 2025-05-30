@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PlaimFilm排班系統</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .auth-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .calendar-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+
+      .calendar {
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 2px;
+        margin-top: 20px;
+      }
+
+      .calendar-header {
+        background: #4caf50;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .week-button-header {
+        background: #ff9800;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 12px;
+      }
+
+      .week-button {
+        background: #fff3e0;
+        border: 1px solid #ff9800;
+        min-height: 80px;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .week-button:hover {
+        background: #ffe0b2;
+      }
+
+      .week-button button {
+        background: #ff9800;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+
+      .week-button button:hover {
+        background: #f57c00;
+      }
+
+      .calendar-day {
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        min-height: 80px;
+        padding: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .calendar-day:hover {
+        background: #e8f5e8;
+      }
+
+      .calendar-day.occupied {
+        background: #ffcdd2;
+      }
+
+      .calendar-day.my-shift {
+        background: #c8e6c9;
+      }
+
+      /* 為每個人的班次產生不同顏色 */
+      .calendar-day.user-shift {
+        border: 3px solid;
+        font-weight: bold;
+      }
+
+      .day-number {
+        font-weight: bold;
+        margin-bottom: 5px;
+      }
+
+      .shift-info {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .controls {
+        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      .controls button {
+        margin: 5px;
+        padding: 10px 15px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .controls button:hover {
+        background: #45a049;
+      }
+
+      .month-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .month-navigation button {
+        padding: 10px 15px;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .month-navigation button:hover {
+        background: #1976d2;
+      }
+
+      .current-month {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .error {
+        color: red;
+        margin-top: 10px;
+      }
+
+      .success {
+        color: green;
+        margin-top: 10px;
+      }
+
+      input[type="email"],
+      input[type="password"] {
+        width: 200px;
+        padding: 8px;
+        margin: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 8px 15px;
+        margin: 5px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .primary-button {
+        background: #4caf50;
+        color: white;
+      }
+
+      .primary-button:hover {
+        background: #45a049;
+      }
+
+      .secondary-button {
+        background: #f44336;
+        color: white;
+      }
+
+      .secondary-button:hover {
+        background: #d32f2f;
+      }
+
+      /* 留言板樣式 */
+      .message-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+
+      .message-board-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .message-input-area {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+      }
+
+      .message-input {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+
+      .message-input:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+      }
+
+      .message-input-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .char-count {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .char-count.warning {
+        color: #ff9800;
+      }
+
+      .char-count.danger {
+        color: #f44336;
+      }
+
+      .message-submit {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .message-submit:hover {
+        background: #218838;
+      }
+
+      .message-submit:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+
+      .message-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: white;
+      }
+
+      .message-item {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.2s;
+        border-left: 4px solid transparent; /* 為顏色條預留空間 */
+      }
+
+      .message-item:hover {
+        background-color: #f8f9fa;
+      }
+
+      .message-item:last-child {
+        border-bottom: none;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .message-author {
+        font-weight: bold;
+        color: #495057;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 13px;
+      }
+
+      .message-time {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .message-content {
+        color: #343a40;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      .message-actions {
+        display: flex;
+        gap: 5px;
+        margin-left: 10px;
+      }
+
+      .message-edit-btn, .message-delete-btn {
+        background: transparent;
+        border: 1px solid #ddd;
+        padding: 4px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+
+      .message-edit-btn {
+        color: #007bff;
+        border-color: #007bff;
+      }
+
+      .message-edit-btn:hover {
+        background: #007bff;
+        color: white;
+      }
+
+      .message-delete-btn {
+        color: #dc3545;
+        border-color: #dc3545;
+      }
+
+      .message-delete-btn:hover {
+        background: #dc3545;
+        color: white;
+      }
+
+      .no-messages {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .loading-messages {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+      }
+
+      /* 編輯留言模態框 */
+      .edit-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none; /* 改為 none，而不是用 hidden class */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .edit-modal.show {
+        display: flex; /* 顯示時使用 flex */
+      }
+
+      .edit-modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .edit-modal-header {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .edit-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .edit-modal-cancel {
+        background: #6c757d;
+        color: white;
+      }
+
+      .edit-modal-save {
+        background: #28a745;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🗓️ PlainFilm排班系統</h1>
+      <p>點擊日期來新增或刪除您的班次</p>
+    </div>
+
+    <!-- 登入/註冊區域 -->
+    <div id="auth-section" class="auth-section">
+      <h3>請先登入或註冊</h3>
+      <div>
+        <input type="email" id="email" placeholder="電子郵件" />
+        <input type="password" id="password" placeholder="密碼" />
+      </div>
+      <div>
+        <button class="primary-button" onclick="signIn()">登入</button>
+        <button class="primary-button" onclick="signUp()">註冊</button>
+      </div>
+      <div id="auth-message"></div>
+    </div>
+
+    <!-- 主要功能區域 -->
+    <div id="main-section" class="calendar-section hidden">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        "
+      >
+        <div>
+          <span>歡迎，</span><span id="user-email"></span>
+          <span id="role-display" style="margin-left: 10px"></span>
+          <button class="secondary-button" onclick="signOut()">登出</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button onclick="clearMyMonthlyShifts()">清除我這個月的所有班次</button>
+      </div>
+
+      <div class="month-navigation">
+        <button onclick="previousMonth()">« 上個月</button>
+        <div class="current-month" id="current-month"></div>
+        <button onclick="nextMonth()">下個月 »</button>
+      </div>
+
+      <div class="calendar" id="calendar">
+        <!-- 日曆標題 -->
+        <div class="week-button-header">排班</div>
+        <div class="calendar-header">一</div>
+        <div class="calendar-header">二</div>
+        <div class="calendar-header">三</div>
+        <div class="calendar-header">四</div>
+        <div class="calendar-header">五</div>
+        <div class="calendar-header">六</div>
+        <div class="calendar-header">日</div>
+      </div>
+    </div>
+
+    <!-- 留言板區域 -->
+    <div id="message-section" class="message-section hidden">
+      <div class="message-board-title" id="message-board-title">
+        💬 留言板
+      </div>
+      
+      <!-- 只有登入後才顯示輸入區域 -->
+      <div id="message-input-section" class="message-input-area hidden">
+        <textarea 
+          id="message-input" 
+          class="message-input" 
+          placeholder="輸入您的留言...（例如：明天有事，想換班的同事請私訊我）"
+          maxlength="500"
+        ></textarea>
+        <div class="message-input-footer">
+          <span id="char-count" class="char-count">0/500</span>
+          <button id="message-submit" class="message-submit" onclick="submitMessage()">
+            發表留言
+          </button>
+        </div>
+      </div>
+      
+      <div class="message-list" id="message-list">
+        <div class="no-messages">請先登入以查看留言</div>
+      </div>
+    </div>
+
+    <!-- 編輯留言模態框 - 確保初始狀態是隱藏的 -->
+    <div id="edit-modal" class="edit-modal">
+      <div class="edit-modal-content">
+        <div class="edit-modal-header">編輯留言</div>
+        <textarea 
+          id="edit-message-input" 
+          class="message-input" 
+          maxlength="500"
+        ></textarea>
+        <div class="message-input-footer">
+          <span id="edit-char-count" class="char-count">0/500</span>
+        </div>
+        <div class="edit-modal-footer">
+          <button class="edit-modal-cancel" onclick="cancelEdit()">取消</button>
+          <button class="edit-modal-save" onclick="saveEdit()">儲存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+      // TODO: 請將下面的 firebaseConfig 替換成您從 Firebase 控制台取得的配置
+      const firebaseConfig = {
+            apiKey: "AIzaSyDcX1hjA9_qyb6kYgYbQaRblwFrXdW-hWo",
+            authDomain: "mchplainfilmschedule.firebaseapp.com",
+            projectId: "mchplainfilmschedule",
+            storageBucket: "mchplainfilmschedule.firebasestorage.app",
+            messagingSenderId: "104675634969",
+            appId: "1:104675634969:web:3816e35be9d4a551415f88",
+            measurementId: "G-5T31DSRENK"
+        };
+
+      // 導入 Firebase 功能
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signOut as firebaseSignOut,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        addDoc,
+        query,
+        where,
+        getDocs,
+        deleteDoc,
+        doc,
+        orderBy,
+        updateDoc,
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+      // 初始化 Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // 全域變數
+      let currentDate = new Date();
+      let currentUser = null;
+      let shiftsData = [];
+      let messagesData = [];
+      let userRole = "normal";
+      let editingMessageId = null;
+
+      // 為使用者產生固定顏色的函數
+      function getUserColor(email) {
+        // 根據 email 產生一個固定的 hash 值
+        let hash = 0;
+        for (let i = 0; i < email.length; i++) {
+          hash = email.charCodeAt(i) + ((hash << 5) - hash);
+          hash = hash & hash;
+        }
+        
+        // 使用 HSL 色彩空間產生顏色，確保顏色鮮明且可讀
+        const hue = Math.abs(hash) % 360;
+        const saturation = 70; // 飽和度固定，避免過淡的顏色
+        const lightness = 85;  // 亮度固定，確保背景色不會太深
+        
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      }
+
+      // 計算文字顏色（根據背景顏色自動選擇深色或淺色文字）
+      function getTextColor(backgroundColor) {
+        // 提取 HSL 值
+        const match = backgroundColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if (!match) return '#000000';
+        
+        const lightness = parseInt(match[3]);
+        // 如果背景較亮，使用深色文字；如果背景較暗，使用淺色文字
+        return lightness > 50 ? '#2c3e50' : '#ffffff';
+      }
+
+      // 權限設定
+      const ADMIN_EMAILS = [
+        "hw98188@gmail.com",
+        // 在這裡加入管理員 email
+      ];
+
+      const READONLY_EMAILS = [
+        "readonly@company.com",
+        "guest@company.com",
+        // 在這裡加入只讀權限的 email
+      ];
+
+      // 檢查使用者權限
+      function getUserRole(email) {
+        if (ADMIN_EMAILS.includes(email)) {
+          return "admin";
+        } else if (READONLY_EMAILS.includes(email)) {
+          return "readonly";
+        } else {
+          return "normal";
+        }
+      }
+
+      // 監聽認證狀態變化
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          currentUser = user;
+          userRole = getUserRole(user.email);
+
+          // 顯示主要區域
+          document.getElementById("auth-section").classList.add("hidden");
+          document.getElementById("main-section").classList.remove("hidden");
+          document.getElementById("message-section").classList.remove("hidden");
+          
+          // 顯示留言輸入區域
+          const messageInputSection = document.getElementById("message-input-section");
+          if (messageInputSection) {
+            messageInputSection.classList.remove("hidden");
+          }
+
+          updateUserInterface();
+          loadShifts();
+          loadMessages();
+        } else {
+          currentUser = null;
+          userRole = "normal";
+          
+          // 隱藏主要區域
+          document.getElementById("auth-section").classList.remove("hidden");
+          document.getElementById("main-section").classList.add("hidden");
+          document.getElementById("message-section").classList.add("hidden");
+          
+          // 隱藏留言輸入區域
+          const messageInputSection = document.getElementById("message-input-section");
+          if (messageInputSection) {
+            messageInputSection.classList.add("hidden");
+          }
+          
+          // 清空留言資料和顯示
+          messagesData = [];
+          const messageList = document.getElementById("message-list");
+          if (messageList) {
+            messageList.innerHTML = '<div class="no-messages">請先登入以查看留言</div>';
+          }
+        }
+      });
+
+      // 更新使用者介面
+      function updateUserInterface() {
+        const userEmail = document.getElementById("user-email");
+        const roleDisplay = document.getElementById("role-display");
+
+        let roleText = "";
+        let roleColor = "";
+
+        switch (userRole) {
+          case "admin":
+            roleText = "👑 管理員";
+            roleColor = "#ff6b6b";
+            break;
+          case "readonly":
+            roleText = "👁️ 只讀權限";
+            roleColor = "#74b9ff";
+            break;
+          default:
+            roleText = "👤 一般使用者";
+            roleColor = "#00b894";
+        }
+
+        userEmail.textContent = currentUser.email;
+        roleDisplay.textContent = roleText;
+        roleDisplay.style.color = roleColor;
+        roleDisplay.style.fontWeight = "bold";
+
+        updateControlsVisibility();
+        updateMessageBoardTitle();
+      }
+
+      // 根據權限更新控制按鈕
+      function updateControlsVisibility() {
+        const controls = document.querySelector(".controls");
+
+        if (userRole === "readonly") {
+          controls.style.display = "none";
+        } else {
+          controls.style.display = "block";
+
+          if (userRole === "admin") {
+            addAdminControls();
+          }
+        }
+      }
+
+      // 新增管理員專用控制按鈕
+      function addAdminControls() {
+        const controls = document.querySelector(".controls");
+
+        if (!document.getElementById("admin-controls")) {
+          const adminDiv = document.createElement("div");
+          adminDiv.id = "admin-controls";
+          adminDiv.style.marginTop = "10px";
+          adminDiv.style.padding = "10px";
+          adminDiv.style.backgroundColor = "#fff5f5";
+          adminDiv.style.border = "2px solid #ff6b6b";
+          adminDiv.style.borderRadius = "5px";
+
+          adminDiv.innerHTML = `
+            <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 10px;">👑 管理員功能</div>
+            <button onclick="clearAllMonthlyShifts()" style="background: #ff6b6b; margin: 5px;">清除所有人這個月的班次</button>
+            <button onclick="showMonthlyStats()" style="background: #0984e3; margin: 5px;">查看月度統計</button>
+          `;
+
+          controls.appendChild(adminDiv);
+        }
+      }
+
+      // 註冊功能
+      window.signUp = async function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const messageDiv = document.getElementById("auth-message");
+
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          messageDiv.innerHTML = '<div class="success">註冊成功！</div>';
+        } catch (error) {
+          messageDiv.innerHTML =
+            '<div class="error">註冊失敗：' + error.message + "</div>";
+        }
+      };
+
+      // 登入功能
+      window.signIn = async function () {
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+        const messageDiv = document.getElementById("auth-message");
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          messageDiv.innerHTML = '<div class="success">登入成功！</div>';
+        } catch (error) {
+          messageDiv.innerHTML =
+            '<div class="error">登入失敗：' + error.message + "</div>";
+        }
+      };
+
+      // 登出功能
+      window.signOut = async function () {
+        try {
+          await firebaseSignOut(auth);
+        } catch (error) {
+          console.error("登出失敗：", error);
+        }
+      };
+
+      // 載入班表數據
+      async function loadShifts() {
+        try {
+          const shiftsRef = collection(db, "shifts");
+          const q = query(shiftsRef, orderBy("date"));
+          const querySnapshot = await getDocs(q);
+
+          shiftsData = [];
+          querySnapshot.forEach((doc) => {
+            shiftsData.push({ id: doc.id, ...doc.data() });
+          });
+
+          renderCalendar();
+        } catch (error) {
+          console.error("載入班表失敗：", error);
+        }
+      }
+
+      // 新增班次
+      async function addShift(dateStr) {
+        try {
+          await addDoc(collection(db, "shifts"), {
+            date: dateStr,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            timestamp: new Date(),
+          });
+          loadShifts();
+        } catch (error) {
+          console.error("新增班次失敗：", error);
+          alert("新增班次失敗：" + error.message);
+        }
+      }
+
+      // 刪除班次
+      async function removeShift(shiftId) {
+        try {
+          await deleteDoc(doc(db, "shifts", shiftId));
+          loadShifts();
+        } catch (error) {
+          console.error("刪除班次失敗：", error);
+          alert("刪除班次失敗：" + error.message);
+        }
+      }
+
+      // ========== 留言板功能 ==========
+
+      // 更新留言板標題
+      function updateMessageBoardTitle() {
+        const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        const currentMonthName = `${currentDate.getFullYear()}年 ${monthNames[currentDate.getMonth()]}`;
+        const titleElement = document.getElementById("message-board-title");
+        if (titleElement) {
+          titleElement.textContent = `💬 ${currentMonthName} 留言板`;
+        }
+      }
+
+      // 載入留言
+      async function loadMessages() {
+        try {
+          const messageList = document.getElementById("message-list");
+          messageList.innerHTML = '<div class="loading-messages">載入留言中...</div>';
+
+          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+          console.log('載入留言，月份:', monthKey);
+
+          const messagesRef = collection(db, "messages");
+          const q = query(messagesRef, where("monthKey", "==", monthKey));
+          const querySnapshot = await getDocs(q);
+
+          messagesData = [];
+          querySnapshot.forEach((doc) => {
+            messagesData.push({ id: doc.id, ...doc.data() });
+          });
+
+          // 按時間排序（最新的在前面）
+          messagesData.sort((a, b) => {
+            const timeA = a.timestamp?.seconds || a.timestamp?.getTime() / 1000 || 0;
+            const timeB = b.timestamp?.seconds || b.timestamp?.getTime() / 1000 || 0;
+            return timeB - timeA;
+          });
+
+          console.log(`載入 ${monthKey} 的留言數量:`, messagesData.length);
+          renderMessages();
+        } catch (error) {
+          console.error("載入留言失敗：", error);
+          messagesData = [];
+          renderMessages();
+        }
+      }
+
+      // 渲染留言列表
+      function renderMessages() {
+        const messageList = document.getElementById("message-list");
+        
+        // 如果未登入，不顯示任何內容
+        if (!currentUser) {
+          messageList.innerHTML = '<div class="no-messages">請先登入以查看留言</div>';
+          return;
+        }
+
+        if (messagesData.length === 0) {
+          messageList.innerHTML = '<div class="no-messages">本月還沒有留言，成為第一個留言的人吧！</div>';
+          return;
+        }
+
+        let html = '';
+        messagesData.forEach(message => {
+          // 處理時間戳記 - 優先顯示編輯時間
+          let displayDate;
+          let timeLabel = '';
+          
+          if (message.editedAt) {
+            // 如果有編輯時間，顯示編輯時間
+            if (message.editedAt?.seconds) {
+              displayDate = new Date(message.editedAt.seconds * 1000);
+            } else if (message.editedAt?.getTime) {
+              displayDate = message.editedAt;
+            } else {
+              displayDate = new Date();
+            }
+            timeLabel = '(已編輯)';
+          } else {
+            // 沒有編輯時間，顯示原始發表時間
+            if (message.timestamp?.seconds) {
+              displayDate = new Date(message.timestamp.seconds * 1000);
+            } else if (message.timestamp?.getTime) {
+              displayDate = message.timestamp;
+            } else {
+              displayDate = new Date();
+            }
+          }
+
+          const formattedTime = displayDate.toLocaleString('zh-TW', {
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          const userName = message.userEmail.split('@')[0];
+          const canEdit = userRole === 'admin' || message.userId === currentUser.uid;
+          
+          // 為每個使用者產生專屬顏色 - 確保 currentUser 存在
+          const userColor = getUserColor(message.userEmail);
+          const textColor = getTextColor(userColor);
+          const isMyMessage = currentUser && message.userId === currentUser.uid;
+
+          html += `
+            <div class="message-item" style="border-left-color: ${userColor};">
+              <div class="message-header">
+                <span class="message-author" style="background-color: ${userColor}; color: ${textColor};">
+                  [${formattedTime}${timeLabel}] ${userName}${isMyMessage ? ' (我)' : ''}：
+                </span>
+                ${canEdit ? `
+                  <div class="message-actions">
+                    <button class="message-edit-btn" onclick="editMessage('${message.id}')">編輯</button>
+                    <button class="message-delete-btn" onclick="deleteMessage('${message.id}')">刪除</button>
+                  </div>
+                ` : ''}
+              </div>
+              <div class="message-content">${message.content}</div>
+            </div>
+          `;
+        });
+
+        messageList.innerHTML = html;
+      }
+
+      // 發表留言
+      window.submitMessage = async function() {
+        // 檢查是否已登入
+        if (!currentUser) {
+          alert('請先登入才能發表留言！');
+          return;
+        }
+        
+        const messageInput = document.getElementById("message-input");
+        const submitButton = document.getElementById("message-submit");
+        
+        const content = messageInput.value.trim();
+        
+        if (!content) {
+          alert('請輸入留言內容！');
+          return;
+        }
+        
+        if (content.length > 500) {
+          alert('留言內容不能超過500字！');
+          return;
+        }
+        
+        submitButton.disabled = true;
+        submitButton.textContent = '發表中...';
+        
+        try {
+          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+          
+          await addDoc(collection(db, "messages"), {
+            content: content,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            monthKey: monthKey,
+            timestamp: new Date()
+          });
+          
+          messageInput.value = '';
+          updateCharCount();
+          
+          console.log('留言發表成功');
+          setTimeout(loadMessages, 300);
+          
+        } catch (error) {
+          console.error('發表留言失敗：', error);
+          alert('發表留言失敗：' + error.message);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = '發表留言';
+        }
+      };
+
+      // 編輯留言 - 加入更多安全檢查
+      window.editMessage = function(messageId) {
+        console.log('editMessage 被呼叫，messageId:', messageId, 'currentUser:', currentUser);
+        
+        if (!currentUser) {
+          console.log('使用者未登入，無法編輯留言');
+          alert('請先登入才能編輯留言！');
+          return;
+        }
+        
+        if (!messageId) {
+          console.log('messageId 無效');
+          return;
+        }
+        
+        const message = messagesData.find(m => m.id === messageId);
+        if (!message) {
+          console.log('找不到對應的留言');
+          return;
+        }
+
+        // 檢查權限
+        if (userRole !== 'admin' && message.userId !== currentUser.uid) {
+          alert('您只能編輯自己的留言！');
+          return;
+        }
+
+        editingMessageId = messageId;
+        const editInput = document.getElementById("edit-message-input");
+        const modal = document.getElementById("edit-modal");
+        
+        if (editInput && modal) {
+          editInput.value = message.content;
+          updateEditCharCount();
+          modal.classList.add("show");
+        }
+      };
+
+      // 取消編輯
+      window.cancelEdit = function() {
+        editingMessageId = null;
+        const modal = document.getElementById("edit-modal");
+        if (modal) {
+          modal.classList.remove("show");
+        }
+      };
+
+      // 儲存編輯
+      window.saveEdit = async function() {
+        if (!editingMessageId) return;
+
+        const editInput = document.getElementById("edit-message-input");
+        const content = editInput.value.trim();
+
+        if (!content) {
+          alert('請輸入留言內容！');
+          return;
+        }
+
+        if (content.length > 500) {
+          alert('留言內容不能超過500字！');
+          return;
+        }
+
+        try {
+          await updateDoc(doc(db, "messages", editingMessageId), {
+            content: content,
+            editedAt: new Date()
+          });
+
+          console.log('留言編輯成功');
+          cancelEdit();
+          setTimeout(loadMessages, 300);
+
+        } catch (error) {
+          console.error('編輯留言失敗：', error);
+          alert('編輯留言失敗：' + error.message);
+        }
+      };
+
+      // 刪除留言 - 加入更多安全檢查
+      window.deleteMessage = async function(messageId) {
+        console.log('deleteMessage 被呼叫，messageId:', messageId, 'currentUser:', currentUser);
+        
+        if (!currentUser) {
+          console.log('使用者未登入，無法刪除留言');
+          alert('請先登入才能刪除留言！');
+          return;
+        }
+        
+        if (!messageId) {
+          console.log('messageId 無效');
+          return;
+        }
+        
+        const message = messagesData.find(m => m.id === messageId);
+        if (!message) {
+          console.log('找不到對應的留言');
+          return;
+        }
+
+        // 檢查權限
+        if (userRole !== 'admin' && message.userId !== currentUser.uid) {
+          alert('您只能刪除自己的留言！');
+          return;
+        }
+
+        const userName = message.userEmail.split('@')[0];
+        if (confirm(`確定要刪除 ${userName} 的留言嗎？`)) {
+          try {
+            await deleteDoc(doc(db, "messages", messageId));
+            console.log('留言刪除成功');
+            setTimeout(loadMessages, 300);
+          } catch (error) {
+            console.error('刪除留言失敗：', error);
+            alert('刪除留言失敗：' + error.message);
+          }
+        }
+      };
+
+      // 更新字數計數
+      function updateCharCount() {
+        const input = document.getElementById("message-input");
+        const counter = document.getElementById("char-count");
+        const length = input.value.length;
+        
+        counter.textContent = `${length}/500`;
+        
+        counter.className = "char-count";
+        if (length > 450) {
+          counter.classList.add("danger");
+        } else if (length > 400) {
+          counter.classList.add("warning");
+        }
+      }
+
+      // 更新編輯模態框字數計數
+      function updateEditCharCount() {
+        const input = document.getElementById("edit-message-input");
+        const counter = document.getElementById("edit-char-count");
+        const length = input.value.length;
+        
+        counter.textContent = `${length}/500`;
+        
+        counter.className = "char-count";
+        if (length > 450) {
+          counter.classList.add("danger");
+        } else if (length > 400) {
+          counter.classList.add("warning");
+        }
+      }
+
+      // 綁定輸入事件
+      document.addEventListener('DOMContentLoaded', function() {
+        const messageInput = document.getElementById("message-input");
+        const editInput = document.getElementById("edit-message-input");
+        
+        if (messageInput) {
+          messageInput.addEventListener('input', updateCharCount);
+        }
+        
+        if (editInput) {
+          editInput.addEventListener('input', updateEditCharCount);
+        }
+      });
+
+      // 渲染日曆
+      function renderCalendar() {
+        const calendar = document.getElementById("calendar");
+        const monthNames = [
+          "一月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+
+        // 更新月份標題
+        document.getElementById("current-month").textContent =
+          currentDate.getFullYear() +
+          "年 " +
+          monthNames[currentDate.getMonth()];
+
+        // 更新留言板標題
+        updateMessageBoardTitle();
+
+        // 清除現有的日期（保留標題）
+        const existingElements = calendar.querySelectorAll(
+          ".calendar-day, .week-button"
+        );
+        existingElements.forEach((element) => element.remove());
+
+        // 計算月份的第一天
+        const firstDay = new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          1
+        );
+
+        // 找到這個月第一個週一
+        const startDate = new Date(firstDay);
+        const dayOfWeek = firstDay.getDay(); // 0=週日, 1=週一, ..., 6=週六
+        const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 週日的話要減6天才到週一
+        startDate.setDate(firstDay.getDate() - daysToSubtract);
+
+        // 生成6週的日曆
+        for (let week = 0; week < 6; week++) {
+          // 創建週的開始日期（週一）
+          const weekStartDate = new Date(startDate);
+          weekStartDate.setDate(startDate.getDate() + week * 7);
+
+          // 添加週按鈕
+          const weekButton = document.createElement("div");
+          weekButton.className = "week-button";
+
+          const button = document.createElement("button");
+          button.textContent = "填滿整週";
+          button.onclick = () => fillWeekFromDate(weekStartDate);
+
+          weekButton.appendChild(button);
+          calendar.appendChild(weekButton);
+
+          // 添加這週的7天（週一到週日）
+          for (let day = 0; day < 7; day++) {
+            const date = new Date(weekStartDate);
+            date.setDate(weekStartDate.getDate() + day);
+
+            const dayElement = document.createElement("div");
+            dayElement.className = "calendar-day";
+
+            const dayNumber = document.createElement("div");
+            dayNumber.className = "day-number";
+            dayNumber.textContent = date.getDate();
+
+            const shiftInfo = document.createElement("div");
+            shiftInfo.className = "shift-info";
+
+            // 檢查這一天是否有班次
+            const dateStr = date.toISOString().split("T")[0];
+            const dayShift = shiftsData.find((shift) => shift.date === dateStr);
+
+            if (dayShift) {
+              const userName = dayShift.userEmail.split("@")[0];
+              shiftInfo.textContent = userName;
+              
+              if (currentUser && dayShift.userId === currentUser.uid) {
+                // 我的班次：保持綠色
+                dayElement.classList.add("my-shift");
+              } else {
+                // 其他人的班次：使用個人專屬顏色
+                dayElement.classList.add("user-shift");
+                const userColor = getUserColor(dayShift.userEmail);
+                const textColor = getTextColor(userColor);
+                
+                dayElement.style.backgroundColor = userColor;
+                dayElement.style.color = textColor;
+                dayElement.style.borderColor = textColor;
+              }
+            }
+
+            // 如果不是當前月份，設為灰色
+            if (date.getMonth() !== currentDate.getMonth()) {
+              dayElement.style.opacity = "0.3";
+            }
+
+            // 週末（週六、週日）可以用不同顏色區別
+            if (day === 5 || day === 6) {
+              // 週六、週日
+              dayElement.style.backgroundColor = "#f0f8ff";
+            }
+
+            // 點擊事件
+            dayElement.addEventListener("click", () =>
+              handleDayClick(dateStr, dayShift)
+            );
+
+            dayElement.appendChild(dayNumber);
+            dayElement.appendChild(shiftInfo);
+            calendar.appendChild(dayElement);
+          }
+        }
+      }
+
+      // 處理日期點擊
+      function handleDayClick(dateStr, existingShift) {
+        // 只讀使用者不能修改班表
+        if (userRole === "readonly") {
+          alert("您是只讀權限，無法修改班表。");
+          return;
+        }
+
+        if (existingShift) {
+          // 管理員可以刪除任何人的班次
+          if (userRole === "admin") {
+            const userName = existingShift.userEmail.split("@")[0];
+            if (confirm(`確定要刪除 ${userName} 在這天的班次嗎？`)) {
+              removeShift(existingShift.id);
+            }
+          } else if (existingShift.userId === currentUser.uid) {
+            // 一般使用者只能刪除自己的班次
+            if (confirm("確定要刪除這個班次嗎？")) {
+              removeShift(existingShift.id);
+            }
+          } else {
+            alert("這天已經有其他人排班了！");
+          }
+        } else {
+          // 新增班次
+          addShift(dateStr);
+        }
+      }
+
+      // 上個月
+      window.previousMonth = function () {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+        loadMessages(); // 載入新月份的留言
+      };
+
+      // 下個月
+      window.nextMonth = function () {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+        loadMessages(); // 載入新月份的留言
+      };
+
+      // 填滿指定週
+      async function fillWeekFromDate(startDate) {
+        // 只讀使用者不能修改班表
+        if (userRole === "readonly") {
+          alert("您是只讀權限，無法修改班表。");
+          return;
+        }
+
+        console.log("開始填滿週:", startDate); // 除錯用
+
+        for (let i = 0; i < 7; i++) {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + i);
+          const dateStr = date.toISOString().split("T")[0];
+
+          console.log("檢查日期:", dateStr); // 除錯用
+
+          // 檢查這天是否已經有人排班
+          const existingShift = shiftsData.find(
+            (shift) => shift.date === dateStr
+          );
+          if (!existingShift) {
+            console.log("新增班次:", dateStr); // 除錯用
+            try {
+              await addShift(dateStr);
+              // 加入小延遲，避免同時發送太多請求
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            } catch (error) {
+              console.error("新增班次失敗:", dateStr, error);
+            }
+          } else {
+            console.log("已有人排班:", dateStr, existingShift.userEmail); // 除錯用
+          }
+        }
+
+        alert("填滿整週完成！");
+      }
+
+      // 管理員功能：清除所有人這個月的班次
+      window.clearAllMonthlyShifts = async function () {
+        if (userRole !== "admin") {
+          alert("只有管理員可以使用此功能！");
+          return;
+        }
+
+        const monthNames = [
+          "一月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+        const currentMonthName =
+          currentDate.getFullYear() +
+          "年 " +
+          monthNames[currentDate.getMonth()];
+
+        if (
+          confirm(
+            `⚠️ 管理員權限 ⚠️\n\n確定要清除所有人在 ${currentMonthName} 的班次嗎？\n\n這個動作無法復原！`
+          )
+        ) {
+          // 計算當月的日期範圍
+          const year = currentDate.getFullYear();
+          const month = currentDate.getMonth();
+          const startOfMonth = new Date(year, month, 1);
+          const endOfMonth = new Date(year, month + 1, 0);
+
+          const startDateStr = startOfMonth.toISOString().split("T")[0];
+          const endDateStr = endOfMonth.toISOString().split("T")[0];
+
+          // 找出這個月所有人的班次
+          const allMonthlyShifts = shiftsData.filter(
+            (shift) => shift.date >= startDateStr && shift.date <= endDateStr
+          );
+
+          if (allMonthlyShifts.length === 0) {
+            alert("這個月沒有任何班次記錄。");
+            return;
+          }
+
+          // 逐一刪除
+          for (const shift of allMonthlyShifts) {
+            try {
+              await removeShift(shift.id);
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            } catch (error) {
+              console.error("刪除班次失敗:", shift.date, error);
+            }
+          }
+
+          alert(`已清除 ${allMonthlyShifts.length} 個班次！`);
+        }
+      };
+
+      // 管理員功能：查看月度統計
+      window.showMonthlyStats = function () {
+        if (userRole !== "admin") {
+          alert("只有管理員可以使用此功能！");
+          return;
+        }
+
+        const monthNames = [
+          "一月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+        const currentMonthName =
+          currentDate.getFullYear() +
+          "年 " +
+          monthNames[currentDate.getMonth()];
+
+        // 計算當月的日期範圍
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const startOfMonth = new Date(year, month, 1);
+        const endOfMonth = new Date(year, month + 1, 0);
+
+        const startDateStr = startOfMonth.toISOString().split("T")[0];
+        const endDateStr = endOfMonth.toISOString().split("T")[0];
+
+        // 統計每個人的班次
+        const stats = {};
+        const monthlyShifts = shiftsData.filter(
+          (shift) => shift.date >= startDateStr && shift.date <= endDateStr
+        );
+
+        monthlyShifts.forEach((shift) => {
+          const email = shift.userEmail;
+          if (!stats[email]) {
+            stats[email] = 0;
+          }
+          stats[email]++;
+        });
+
+        // 建立統計報告
+        let report = `📊 ${currentMonthName} 班次統計\n\n`;
+
+        if (Object.keys(stats).length === 0) {
+          report += "這個月還沒有任何班次記錄。";
+        } else {
+          Object.entries(stats)
+            .sort((a, b) => b[1] - a[1]) // 按班次數量排序
+            .forEach(([email, count]) => {
+              const name = email.split("@")[0];
+              report += `${name}: ${count} 天\n`;
+            });
+
+          const totalDays = Object.values(stats).reduce(
+            (sum, count) => sum + count,
+            0
+          );
+          report += `\n總共: ${totalDays} 天`;
+        }
+
+        alert(report);
+      };
+
+      // 清除我這個月的所有班次
+      window.clearMyMonthlyShifts = async function () {
+        // 只讀使用者不能修改班表
+        if (userRole === "readonly") {
+          alert("您是只讀權限，無法修改班表。");
+          return;
+        }
+
+        const monthNames = [
+          "一月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+        const currentMonthName =
+          currentDate.getFullYear() +
+          "年 " +
+          monthNames[currentDate.getMonth()];
+
+        if (confirm(`確定要清除您在 ${currentMonthName} 的所有班次嗎？`)) {
+          // 計算當月的日期範圍
+          const year = currentDate.getFullYear();
+          const month = currentDate.getMonth();
+          const startOfMonth = new Date(year, month, 1);
+          const endOfMonth = new Date(year, month + 1, 0);
+
+          const startDateStr = startOfMonth.toISOString().split("T")[0];
+          const endDateStr = endOfMonth.toISOString().split("T")[0];
+
+          console.log(`清除 ${startDateStr} 到 ${endDateStr} 的班次`);
+
+          // 找出這個月我的所有班次
+          const myMonthlyShifts = shiftsData.filter(
+            (shift) =>
+              shift.userId === currentUser.uid &&
+              shift.date >= startDateStr &&
+              shift.date <= endDateStr
+          );
+
+          console.log("找到班次數量:", myMonthlyShifts.length);
+
+          if (myMonthlyShifts.length === 0) {
+            alert("您在這個月沒有排班記錄。");
+            return;
+          }
+
+          // 逐一刪除
+          for (const shift of myMonthlyShifts) {
+            try {
+              await removeShift(shift.id);
+              // 加入小延遲避免請求過於頻繁
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            } catch (error) {
+              console.error("刪除班次失敗:", shift.date, error);
+            }
+          }
+
+          alert(`已清除 ${myMonthlyShifts.length} 個班次！`);
+        }
+      };
+
+      // 初始化
+      renderCalendar();
+    </script>
+  </body>
+</html>
