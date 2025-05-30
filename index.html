@@ -35,6 +35,7 @@
         padding: 20px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
       }
 
       .calendar {
@@ -215,6 +216,234 @@
       .secondary-button:hover {
         background: #d32f2f;
       }
+
+      /* 留言板樣式 */
+      .message-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+      }
+
+      .message-board-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .message-input-area {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+      }
+
+      .message-input {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: vertical;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+
+      .message-input:focus {
+        outline: none;
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+      }
+
+      .message-input-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      .char-count {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .char-count.warning {
+        color: #ff9800;
+      }
+
+      .char-count.danger {
+        color: #f44336;
+      }
+
+      .message-submit {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .message-submit:hover {
+        background: #218838;
+      }
+
+      .message-submit:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+      }
+
+      .message-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background: white;
+      }
+
+      .message-item {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.2s;
+      }
+
+      .message-item:hover {
+        background-color: #f8f9fa;
+      }
+
+      .message-item:last-child {
+        border-bottom: none;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .message-author {
+        font-weight: bold;
+        color: #495057;
+      }
+
+      .message-time {
+        font-size: 12px;
+        color: #6c757d;
+      }
+
+      .message-content {
+        color: #343a40;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      .message-actions {
+        display: flex;
+        gap: 5px;
+        margin-left: 10px;
+      }
+
+      .message-edit-btn, .message-delete-btn {
+        background: transparent;
+        border: 1px solid #ddd;
+        padding: 4px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+
+      .message-edit-btn {
+        color: #007bff;
+        border-color: #007bff;
+      }
+
+      .message-edit-btn:hover {
+        background: #007bff;
+        color: white;
+      }
+
+      .message-delete-btn {
+        color: #dc3545;
+        border-color: #dc3545;
+      }
+
+      .message-delete-btn:hover {
+        background: #dc3545;
+        color: white;
+      }
+
+      .no-messages {
+        text-align: center;
+        padding: 40px;
+        color: #6c757d;
+        font-style: italic;
+      }
+
+      .loading-messages {
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+      }
+
+      /* 編輯留言模態框 */
+      .edit-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none; /* 改為 none，而不是用 hidden class */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .edit-modal.show {
+        display: flex; /* 顯示時使用 flex */
+      }
+
+      .edit-modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .edit-modal-header {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #333;
+      }
+
+      .edit-modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .edit-modal-cancel {
+        background: #6c757d;
+        color: white;
+      }
+
+      .edit-modal-save {
+        background: #28a745;
+        color: white;
+      }
     </style>
   </head>
   <body>
@@ -277,18 +506,64 @@
       </div>
     </div>
 
+    <!-- 留言板區域 -->
+    <div id="message-section" class="message-section hidden">
+      <div class="message-board-title" id="message-board-title">
+        💬 留言板
+      </div>
+      
+      <!-- 只有登入後才顯示輸入區域 -->
+      <div id="message-input-section" class="message-input-area hidden">
+        <textarea 
+          id="message-input" 
+          class="message-input" 
+          placeholder="輸入您的留言...（例如：明天有事，想換班的同事請私訊我）"
+          maxlength="500"
+        ></textarea>
+        <div class="message-input-footer">
+          <span id="char-count" class="char-count">0/500</span>
+          <button id="message-submit" class="message-submit" onclick="submitMessage()">
+            發表留言
+          </button>
+        </div>
+      </div>
+      
+      <div class="message-list" id="message-list">
+        <div class="no-messages">請先登入以查看留言</div>
+      </div>
+    </div>
+
+    <!-- 編輯留言模態框 - 確保初始狀態是隱藏的 -->
+    <div id="edit-modal" class="edit-modal">
+      <div class="edit-modal-content">
+        <div class="edit-modal-header">編輯留言</div>
+        <textarea 
+          id="edit-message-input" 
+          class="message-input" 
+          maxlength="500"
+        ></textarea>
+        <div class="message-input-footer">
+          <span id="edit-char-count" class="char-count">0/500</span>
+        </div>
+        <div class="edit-modal-footer">
+          <button class="edit-modal-cancel" onclick="cancelEdit()">取消</button>
+          <button class="edit-modal-save" onclick="saveEdit()">儲存</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
       // TODO: 請將下面的 firebaseConfig 替換成您從 Firebase 控制台取得的配置
       const firebaseConfig = {
-        apiKey: "AIzaSyDcX1hjA9_qyb6kYgYbQaRblwFrXdW-hWo",
-        authDomain: "mchplainfilmschedule.firebaseapp.com",
-        projectId: "mchplainfilmschedule",
-        storageBucket: "mchplainfilmschedule.firebasestorage.app",
-        messagingSenderId: "104675634969",
-        appId: "1:104675634969:web:3816e35be9d4a551415f88",
-        measurementId: "G-5T31DSRENK",
-      };
+            apiKey: "AIzaSyDcX1hjA9_qyb6kYgYbQaRblwFrXdW-hWo",
+            authDomain: "mchplainfilmschedule.firebaseapp.com",
+            projectId: "mchplainfilmschedule",
+            storageBucket: "mchplainfilmschedule.firebasestorage.app",
+            messagingSenderId: "104675634969",
+            appId: "1:104675634969:web:3816e35be9d4a551415f88",
+            measurementId: "G-5T31DSRENK"
+        };
 
       // 導入 Firebase 功能
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -309,6 +584,7 @@
         deleteDoc,
         doc,
         orderBy,
+        updateDoc,
       } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
       // 初始化 Firebase
@@ -320,7 +596,9 @@
       let currentDate = new Date();
       let currentUser = null;
       let shiftsData = [];
-      let userRole = "normal"; // 預設為一般使用者
+      let messagesData = [];
+      let userRole = "normal";
+      let editingMessageId = null;
 
       // 權限設定
       const ADMIN_EMAILS = [
@@ -329,6 +607,7 @@
       ];
 
       const READONLY_EMAILS = [
+        "readonly@company.com",
         "guest@company.com",
         // 在這裡加入只讀權限的 email
       ];
@@ -350,17 +629,41 @@
           currentUser = user;
           userRole = getUserRole(user.email);
 
+          // 顯示主要區域
           document.getElementById("auth-section").classList.add("hidden");
           document.getElementById("main-section").classList.remove("hidden");
+          document.getElementById("message-section").classList.remove("hidden");
+          
+          // 顯示留言輸入區域
+          const messageInputSection = document.getElementById("message-input-section");
+          if (messageInputSection) {
+            messageInputSection.classList.remove("hidden");
+          }
 
-          // 更新使用者資訊顯示
           updateUserInterface();
           loadShifts();
+          loadMessages();
         } else {
           currentUser = null;
           userRole = "normal";
+          
+          // 隱藏主要區域
           document.getElementById("auth-section").classList.remove("hidden");
           document.getElementById("main-section").classList.add("hidden");
+          document.getElementById("message-section").classList.add("hidden");
+          
+          // 隱藏留言輸入區域
+          const messageInputSection = document.getElementById("message-input-section");
+          if (messageInputSection) {
+            messageInputSection.classList.add("hidden");
+          }
+          
+          // 清空留言資料和顯示
+          messagesData = [];
+          const messageList = document.getElementById("message-list");
+          if (messageList) {
+            messageList.innerHTML = '<div class="no-messages">請先登入以查看留言</div>';
+          }
         }
       });
 
@@ -391,8 +694,8 @@
         roleDisplay.style.color = roleColor;
         roleDisplay.style.fontWeight = "bold";
 
-        // 根據權限顯示/隱藏控制按鈕
         updateControlsVisibility();
+        updateMessageBoardTitle();
       }
 
       // 根據權限更新控制按鈕
@@ -400,12 +703,10 @@
         const controls = document.querySelector(".controls");
 
         if (userRole === "readonly") {
-          // 只讀使用者隱藏所有控制按鈕
           controls.style.display = "none";
         } else {
           controls.style.display = "block";
 
-          // 管理員顯示額外功能
           if (userRole === "admin") {
             addAdminControls();
           }
@@ -416,7 +717,6 @@
       function addAdminControls() {
         const controls = document.querySelector(".controls");
 
-        // 檢查是否已經加入管理員按鈕
         if (!document.getElementById("admin-controls")) {
           const adminDiv = document.createElement("div");
           adminDiv.id = "admin-controls";
@@ -427,10 +727,10 @@
           adminDiv.style.borderRadius = "5px";
 
           adminDiv.innerHTML = `
-                    <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 10px;">👑 管理員功能</div>
-                    <button onclick="clearAllMonthlyShifts()" style="background: #ff6b6b; margin: 5px;">清除所有人這個月的班次</button>
-                    <button onclick="showMonthlyStats()" style="background: #0984e3; margin: 5px;">查看月度統計</button>
-                `;
+            <div style="color: #ff6b6b; font-weight: bold; margin-bottom: 10px;">👑 管理員功能</div>
+            <button onclick="clearAllMonthlyShifts()" style="background: #ff6b6b; margin: 5px;">清除所有人這個月的班次</button>
+            <button onclick="showMonthlyStats()" style="background: #0984e3; margin: 5px;">查看月度統計</button>
+          `;
 
           controls.appendChild(adminDiv);
         }
@@ -520,6 +820,341 @@
         }
       }
 
+      // ========== 留言板功能 ==========
+
+      // 更新留言板標題
+      function updateMessageBoardTitle() {
+        const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+        const currentMonthName = `${currentDate.getFullYear()}年 ${monthNames[currentDate.getMonth()]}`;
+        const titleElement = document.getElementById("message-board-title");
+        if (titleElement) {
+          titleElement.textContent = `💬 ${currentMonthName} 留言板`;
+        }
+      }
+
+      // 載入留言
+      async function loadMessages() {
+        try {
+          const messageList = document.getElementById("message-list");
+          messageList.innerHTML = '<div class="loading-messages">載入留言中...</div>';
+
+          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+          console.log('載入留言，月份:', monthKey);
+
+          const messagesRef = collection(db, "messages");
+          const q = query(messagesRef, where("monthKey", "==", monthKey));
+          const querySnapshot = await getDocs(q);
+
+          messagesData = [];
+          querySnapshot.forEach((doc) => {
+            messagesData.push({ id: doc.id, ...doc.data() });
+          });
+
+          // 按時間排序（最新的在前面）
+          messagesData.sort((a, b) => {
+            const timeA = a.timestamp?.seconds || a.timestamp?.getTime() / 1000 || 0;
+            const timeB = b.timestamp?.seconds || b.timestamp?.getTime() / 1000 || 0;
+            return timeB - timeA;
+          });
+
+          console.log(`載入 ${monthKey} 的留言數量:`, messagesData.length);
+          renderMessages();
+        } catch (error) {
+          console.error("載入留言失敗：", error);
+          messagesData = [];
+          renderMessages();
+        }
+      }
+
+      // 渲染留言列表
+      function renderMessages() {
+        const messageList = document.getElementById("message-list");
+        
+        // 如果未登入，不顯示任何內容
+        if (!currentUser) {
+          messageList.innerHTML = '<div class="no-messages">請先登入以查看留言</div>';
+          return;
+        }
+
+        if (messagesData.length === 0) {
+          messageList.innerHTML = '<div class="no-messages">本月還沒有留言，成為第一個留言的人吧！</div>';
+          return;
+        }
+
+        let html = '';
+        messagesData.forEach(message => {
+          // 處理時間戳記 - 優先顯示編輯時間
+          let displayDate;
+          let timeLabel = '';
+          
+          if (message.editedAt) {
+            // 如果有編輯時間，顯示編輯時間
+            if (message.editedAt?.seconds) {
+              displayDate = new Date(message.editedAt.seconds * 1000);
+            } else if (message.editedAt?.getTime) {
+              displayDate = message.editedAt;
+            } else {
+              displayDate = new Date();
+            }
+            timeLabel = '(已編輯)';
+          } else {
+            // 沒有編輯時間，顯示原始發表時間
+            if (message.timestamp?.seconds) {
+              displayDate = new Date(message.timestamp.seconds * 1000);
+            } else if (message.timestamp?.getTime) {
+              displayDate = message.timestamp;
+            } else {
+              displayDate = new Date();
+            }
+          }
+
+          const formattedTime = displayDate.toLocaleString('zh-TW', {
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          const userName = message.userEmail.split('@')[0];
+          const canEdit = userRole === 'admin' || message.userId === currentUser.uid;
+
+          html += `
+            <div class="message-item">
+              <div class="message-header">
+                <span class="message-author">[${formattedTime}${timeLabel}] ${userName}：</span>
+                ${canEdit ? `
+                  <div class="message-actions">
+                    <button class="message-edit-btn" onclick="editMessage('${message.id}')">編輯</button>
+                    <button class="message-delete-btn" onclick="deleteMessage('${message.id}')">刪除</button>
+                  </div>
+                ` : ''}
+              </div>
+              <div class="message-content">${message.content}</div>
+            </div>
+          `;
+        });
+
+        messageList.innerHTML = html;
+      }
+
+      // 發表留言
+      window.submitMessage = async function() {
+        // 檢查是否已登入
+        if (!currentUser) {
+          alert('請先登入才能發表留言！');
+          return;
+        }
+        
+        const messageInput = document.getElementById("message-input");
+        const submitButton = document.getElementById("message-submit");
+        
+        const content = messageInput.value.trim();
+        
+        if (!content) {
+          alert('請輸入留言內容！');
+          return;
+        }
+        
+        if (content.length > 500) {
+          alert('留言內容不能超過500字！');
+          return;
+        }
+        
+        submitButton.disabled = true;
+        submitButton.textContent = '發表中...';
+        
+        try {
+          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+          
+          await addDoc(collection(db, "messages"), {
+            content: content,
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            monthKey: monthKey,
+            timestamp: new Date()
+          });
+          
+          messageInput.value = '';
+          updateCharCount();
+          
+          console.log('留言發表成功');
+          setTimeout(loadMessages, 300);
+          
+        } catch (error) {
+          console.error('發表留言失敗：', error);
+          alert('發表留言失敗：' + error.message);
+        } finally {
+          submitButton.disabled = false;
+          submitButton.textContent = '發表留言';
+        }
+      };
+
+      // 編輯留言 - 加入更多安全檢查
+      window.editMessage = function(messageId) {
+        console.log('editMessage 被呼叫，messageId:', messageId, 'currentUser:', currentUser);
+        
+        if (!currentUser) {
+          console.log('使用者未登入，無法編輯留言');
+          alert('請先登入才能編輯留言！');
+          return;
+        }
+        
+        if (!messageId) {
+          console.log('messageId 無效');
+          return;
+        }
+        
+        const message = messagesData.find(m => m.id === messageId);
+        if (!message) {
+          console.log('找不到對應的留言');
+          return;
+        }
+
+        // 檢查權限
+        if (userRole !== 'admin' && message.userId !== currentUser.uid) {
+          alert('您只能編輯自己的留言！');
+          return;
+        }
+
+        editingMessageId = messageId;
+        const editInput = document.getElementById("edit-message-input");
+        const modal = document.getElementById("edit-modal");
+        
+        if (editInput && modal) {
+          editInput.value = message.content;
+          updateEditCharCount();
+          modal.classList.add("show");
+        }
+      };
+
+      // 取消編輯
+      window.cancelEdit = function() {
+        editingMessageId = null;
+        const modal = document.getElementById("edit-modal");
+        if (modal) {
+          modal.classList.remove("show");
+        }
+      };
+
+      // 儲存編輯
+      window.saveEdit = async function() {
+        if (!editingMessageId) return;
+
+        const editInput = document.getElementById("edit-message-input");
+        const content = editInput.value.trim();
+
+        if (!content) {
+          alert('請輸入留言內容！');
+          return;
+        }
+
+        if (content.length > 500) {
+          alert('留言內容不能超過500字！');
+          return;
+        }
+
+        try {
+          await updateDoc(doc(db, "messages", editingMessageId), {
+            content: content,
+            editedAt: new Date()
+          });
+
+          console.log('留言編輯成功');
+          cancelEdit();
+          setTimeout(loadMessages, 300);
+
+        } catch (error) {
+          console.error('編輯留言失敗：', error);
+          alert('編輯留言失敗：' + error.message);
+        }
+      };
+
+      // 刪除留言 - 加入更多安全檢查
+      window.deleteMessage = async function(messageId) {
+        console.log('deleteMessage 被呼叫，messageId:', messageId, 'currentUser:', currentUser);
+        
+        if (!currentUser) {
+          console.log('使用者未登入，無法刪除留言');
+          alert('請先登入才能刪除留言！');
+          return;
+        }
+        
+        if (!messageId) {
+          console.log('messageId 無效');
+          return;
+        }
+        
+        const message = messagesData.find(m => m.id === messageId);
+        if (!message) {
+          console.log('找不到對應的留言');
+          return;
+        }
+
+        // 檢查權限
+        if (userRole !== 'admin' && message.userId !== currentUser.uid) {
+          alert('您只能刪除自己的留言！');
+          return;
+        }
+
+        const userName = message.userEmail.split('@')[0];
+        if (confirm(`確定要刪除 ${userName} 的留言嗎？`)) {
+          try {
+            await deleteDoc(doc(db, "messages", messageId));
+            console.log('留言刪除成功');
+            setTimeout(loadMessages, 300);
+          } catch (error) {
+            console.error('刪除留言失敗：', error);
+            alert('刪除留言失敗：' + error.message);
+          }
+        }
+      };
+
+      // 更新字數計數
+      function updateCharCount() {
+        const input = document.getElementById("message-input");
+        const counter = document.getElementById("char-count");
+        const length = input.value.length;
+        
+        counter.textContent = `${length}/500`;
+        
+        counter.className = "char-count";
+        if (length > 450) {
+          counter.classList.add("danger");
+        } else if (length > 400) {
+          counter.classList.add("warning");
+        }
+      }
+
+      // 更新編輯模態框字數計數
+      function updateEditCharCount() {
+        const input = document.getElementById("edit-message-input");
+        const counter = document.getElementById("edit-char-count");
+        const length = input.value.length;
+        
+        counter.textContent = `${length}/500`;
+        
+        counter.className = "char-count";
+        if (length > 450) {
+          counter.classList.add("danger");
+        } else if (length > 400) {
+          counter.classList.add("warning");
+        }
+      }
+
+      // 綁定輸入事件
+      document.addEventListener('DOMContentLoaded', function() {
+        const messageInput = document.getElementById("message-input");
+        const editInput = document.getElementById("edit-message-input");
+        
+        if (messageInput) {
+          messageInput.addEventListener('input', updateCharCount);
+        }
+        
+        if (editInput) {
+          editInput.addEventListener('input', updateEditCharCount);
+        }
+      });
+
       // 渲染日曆
       function renderCalendar() {
         const calendar = document.getElementById("calendar");
@@ -543,6 +1178,9 @@
           currentDate.getFullYear() +
           "年 " +
           monthNames[currentDate.getMonth()];
+
+        // 更新留言板標題
+        updateMessageBoardTitle();
 
         // 清除現有的日期（保留標題）
         const existingElements = calendar.querySelectorAll(
@@ -664,12 +1302,14 @@
       window.previousMonth = function () {
         currentDate.setMonth(currentDate.getMonth() - 1);
         renderCalendar();
+        loadMessages(); // 載入新月份的留言
       };
 
       // 下個月
       window.nextMonth = function () {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar();
+        loadMessages(); // 載入新月份的留言
       };
 
       // 填滿指定週
@@ -844,15 +1484,6 @@
         }
 
         alert(report);
-      };
-
-      // 填滿這週（舊功能，保留以防萬一）
-      window.fillWeek = async function () {
-        const today = new Date();
-        const startOfWeek = new Date(today);
-        startOfWeek.setDate(today.getDate() - today.getDay()); // 週日為起始
-
-        await fillWeekFromDate(startOfWeek);
       };
 
       // 清除我這個月的所有班次
