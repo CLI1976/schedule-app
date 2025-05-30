@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>排班系統</title>
+    <title>PlainFilm排班系統</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -112,6 +112,12 @@
 
       .calendar-day.my-shift {
         background: #c8e6c9;
+      }
+
+      /* 為每個人的班次產生不同顏色 */
+      .calendar-day.user-shift {
+        border: 3px solid;
+        font-weight: bold;
       }
 
       .day-number {
@@ -448,7 +454,7 @@
   </head>
   <body>
     <div class="header">
-      <h1>🗓️ 排班系統</h1>
+      <h1>🗓️ PlainFilm排班系統</h1>
       <p>點擊日期來新增或刪除您的班次</p>
     </div>
 
@@ -517,7 +523,7 @@
         <textarea 
           id="message-input" 
           class="message-input" 
-          placeholder="輸入您的留言...（例如：07/08交班時間請設定在中午12點或下午17點?）"
+          placeholder="輸入您的留言...（例如：明天有事，想換班的同事請私訊我）"
           maxlength="500"
         ></textarea>
         <div class="message-input-footer">
@@ -599,6 +605,34 @@
       let messagesData = [];
       let userRole = "normal";
       let editingMessageId = null;
+
+      // 為使用者產生固定顏色的函數
+      function getUserColor(email) {
+        // 根據 email 產生一個固定的 hash 值
+        let hash = 0;
+        for (let i = 0; i < email.length; i++) {
+          hash = email.charCodeAt(i) + ((hash << 5) - hash);
+          hash = hash & hash;
+        }
+        
+        // 使用 HSL 色彩空間產生顏色，確保顏色鮮明且可讀
+        const hue = Math.abs(hash) % 360;
+        const saturation = 70; // 飽和度固定，避免過淡的顏色
+        const lightness = 85;  // 亮度固定，確保背景色不會太深
+        
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+      }
+
+      // 計算文字顏色（根據背景顏色自動選擇深色或淺色文字）
+      function getTextColor(backgroundColor) {
+        // 提取 HSL 值
+        const match = backgroundColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
+        if (!match) return '#000000';
+        
+        const lightness = parseInt(match[3]);
+        // 如果背景較亮，使用深色文字；如果背景較暗，使用淺色文字
+        return lightness > 50 ? '#2c3e50' : '#ffffff';
+      }
 
       // 權限設定
       const ADMIN_EMAILS = [
@@ -1238,11 +1272,21 @@
             const dayShift = shiftsData.find((shift) => shift.date === dateStr);
 
             if (dayShift) {
-              shiftInfo.textContent = dayShift.userEmail.split("@")[0];
+              const userName = dayShift.userEmail.split("@")[0];
+              shiftInfo.textContent = userName;
+              
               if (dayShift.userId === currentUser.uid) {
+                // 我的班次：保持綠色
                 dayElement.classList.add("my-shift");
               } else {
-                dayElement.classList.add("occupied");
+                // 其他人的班次：使用個人專屬顏色
+                dayElement.classList.add("user-shift");
+                const userColor = getUserColor(dayShift.userEmail);
+                const textColor = getTextColor(userColor);
+                
+                dayElement.style.backgroundColor = userColor;
+                dayElement.style.color = textColor;
+                dayElement.style.borderColor = textColor;
               }
             }
 
