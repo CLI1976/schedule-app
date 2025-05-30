@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PlainFilm排班系統</title>
+    <title>PlaimFilm排班系統</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -318,6 +318,7 @@
         padding: 15px;
         border-bottom: 1px solid #e9ecef;
         transition: background-color 0.2s;
+        border-left: 4px solid transparent; /* 為顏色條預留空間 */
       }
 
       .message-item:hover {
@@ -338,6 +339,9 @@
       .message-author {
         font-weight: bold;
         color: #495057;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 13px;
       }
 
       .message-time {
@@ -951,11 +955,18 @@
 
           const userName = message.userEmail.split('@')[0];
           const canEdit = userRole === 'admin' || message.userId === currentUser.uid;
+          
+          // 為每個使用者產生專屬顏色 - 確保 currentUser 存在
+          const userColor = getUserColor(message.userEmail);
+          const textColor = getTextColor(userColor);
+          const isMyMessage = currentUser && message.userId === currentUser.uid;
 
           html += `
-            <div class="message-item">
+            <div class="message-item" style="border-left-color: ${userColor};">
               <div class="message-header">
-                <span class="message-author">[${formattedTime}${timeLabel}] ${userName}：</span>
+                <span class="message-author" style="background-color: ${userColor}; color: ${textColor};">
+                  [${formattedTime}${timeLabel}] ${userName}${isMyMessage ? ' (我)' : ''}：
+                </span>
                 ${canEdit ? `
                   <div class="message-actions">
                     <button class="message-edit-btn" onclick="editMessage('${message.id}')">編輯</button>
@@ -1275,7 +1286,7 @@
               const userName = dayShift.userEmail.split("@")[0];
               shiftInfo.textContent = userName;
               
-              if (dayShift.userId === currentUser.uid) {
+              if (currentUser && dayShift.userId === currentUser.uid) {
                 // 我的班次：保持綠色
                 dayElement.classList.add("my-shift");
               } else {
