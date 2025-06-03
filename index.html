@@ -361,7 +361,8 @@
         margin-left: 10px;
       }
 
-      .message-edit-btn, .message-delete-btn {
+      .message-edit-btn,
+      .message-delete-btn {
         background: transparent;
         border: 1px solid #ddd;
         padding: 4px 8px;
@@ -518,26 +519,28 @@
 
     <!-- 留言板區域 -->
     <div id="message-section" class="message-section hidden">
-      <div class="message-board-title" id="message-board-title">
-        💬 留言板
-      </div>
-      
+      <div class="message-board-title" id="message-board-title">💬 留言板</div>
+
       <!-- 只有登入後才顯示輸入區域 -->
       <div id="message-input-section" class="message-input-area hidden">
-        <textarea 
-          id="message-input" 
-          class="message-input" 
+        <textarea
+          id="message-input"
+          class="message-input"
           placeholder="輸入您的留言...（例如：07/27交班時間希望在20:00後交給下一班）"
           maxlength="500"
         ></textarea>
         <div class="message-input-footer">
           <span id="char-count" class="char-count">0/500</span>
-          <button id="message-submit" class="message-submit" onclick="submitMessage()">
+          <button
+            id="message-submit"
+            class="message-submit"
+            onclick="submitMessage()"
+          >
             發表留言
           </button>
         </div>
       </div>
-      
+
       <div class="message-list" id="message-list">
         <div class="no-messages">請先登入以查看留言</div>
       </div>
@@ -547,9 +550,9 @@
     <div id="edit-modal" class="edit-modal">
       <div class="edit-modal-content">
         <div class="edit-modal-header">編輯留言</div>
-        <textarea 
-          id="edit-message-input" 
-          class="message-input" 
+        <textarea
+          id="edit-message-input"
+          class="message-input"
           maxlength="500"
         ></textarea>
         <div class="message-input-footer">
@@ -566,14 +569,14 @@
     <script type="module">
       // TODO: 請將下面的 firebaseConfig 替換成您從 Firebase 控制台取得的配置
       const firebaseConfig = {
-            apiKey: "AIzaSyDcX1hjA9_qyb6kYgYbQaRblwFrXdW-hWo",
-            authDomain: "mchplainfilmschedule.firebaseapp.com",
-            projectId: "mchplainfilmschedule",
-            storageBucket: "mchplainfilmschedule.firebasestorage.app",
-            messagingSenderId: "104675634969",
-            appId: "1:104675634969:web:3816e35be9d4a551415f88",
-            measurementId: "G-5T31DSRENK"
-        };
+        apiKey: "AIzaSyDcX1hjA9_qyb6kYgYbQaRblwFrXdW-hWo",
+        authDomain: "mchplainfilmschedule.firebaseapp.com",
+        projectId: "mchplainfilmschedule",
+        storageBucket: "mchplainfilmschedule.firebasestorage.app",
+        messagingSenderId: "104675634969",
+        appId: "1:104675634969:web:3816e35be9d4a551415f88",
+        measurementId: "G-5T31DSRENK",
+      };
 
       // 導入 Firebase 功能
       import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -618,12 +621,12 @@
           hash = email.charCodeAt(i) + ((hash << 5) - hash);
           hash = hash & hash;
         }
-        
+
         // 使用 HSL 色彩空間產生顏色，確保顏色鮮明且可讀
         const hue = Math.abs(hash) % 360;
         const saturation = 70; // 飽和度固定，避免過淡的顏色
-        const lightness = 85;  // 亮度固定，確保背景色不會太深
-        
+        const lightness = 85; // 亮度固定，確保背景色不會太深
+
         return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
       }
 
@@ -631,11 +634,11 @@
       function getTextColor(backgroundColor) {
         // 提取 HSL 值
         const match = backgroundColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-        if (!match) return '#000000';
-        
+        if (!match) return "#000000";
+
         const lightness = parseInt(match[3]);
         // 如果背景較亮，使用深色文字；如果背景較暗，使用淺色文字
-        return lightness > 50 ? '#2c3e50' : '#ffffff';
+        return lightness > 50 ? "#2c3e50" : "#ffffff";
       }
 
       // 權限設定
@@ -645,7 +648,7 @@
       ];
 
       const READONLY_EMAILS = [
-        "readonly@company.com",
+        "shusaku420@gmail.com",
         "guest@company.com",
         // 在這裡加入只讀權限的 email
       ];
@@ -671,9 +674,11 @@
           document.getElementById("auth-section").classList.add("hidden");
           document.getElementById("main-section").classList.remove("hidden");
           document.getElementById("message-section").classList.remove("hidden");
-          
+
           // 顯示留言輸入區域
-          const messageInputSection = document.getElementById("message-input-section");
+          const messageInputSection = document.getElementById(
+            "message-input-section"
+          );
           if (messageInputSection) {
             messageInputSection.classList.remove("hidden");
           }
@@ -684,23 +689,26 @@
         } else {
           currentUser = null;
           userRole = "normal";
-          
+
           // 隱藏主要區域
           document.getElementById("auth-section").classList.remove("hidden");
           document.getElementById("main-section").classList.add("hidden");
           document.getElementById("message-section").classList.add("hidden");
-          
+
           // 隱藏留言輸入區域
-          const messageInputSection = document.getElementById("message-input-section");
+          const messageInputSection = document.getElementById(
+            "message-input-section"
+          );
           if (messageInputSection) {
             messageInputSection.classList.add("hidden");
           }
-          
+
           // 清空留言資料和顯示
           messagesData = [];
           const messageList = document.getElementById("message-list");
           if (messageList) {
-            messageList.innerHTML = '<div class="no-messages">請先登入以查看留言</div>';
+            messageList.innerHTML =
+              '<div class="no-messages">請先登入以查看留言</div>';
           }
         }
       });
@@ -862,8 +870,23 @@
 
       // 更新留言板標題
       function updateMessageBoardTitle() {
-        const monthNames = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
-        const currentMonthName = `${currentDate.getFullYear()}年 ${monthNames[currentDate.getMonth()]}`;
+        const monthNames = [
+          "一月",
+          "二月",
+          "三月",
+          "四月",
+          "五月",
+          "六月",
+          "七月",
+          "八月",
+          "九月",
+          "十月",
+          "十一月",
+          "十二月",
+        ];
+        const currentMonthName = `${currentDate.getFullYear()}年 ${
+          monthNames[currentDate.getMonth()]
+        }`;
         const titleElement = document.getElementById("message-board-title");
         if (titleElement) {
           titleElement.textContent = `💬 ${currentMonthName} 留言板`;
@@ -874,10 +897,13 @@
       async function loadMessages() {
         try {
           const messageList = document.getElementById("message-list");
-          messageList.innerHTML = '<div class="loading-messages">載入留言中...</div>';
+          messageList.innerHTML =
+            '<div class="loading-messages">載入留言中...</div>';
 
-          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-          console.log('載入留言，月份:', monthKey);
+          const monthKey = `${currentDate.getFullYear()}-${String(
+            currentDate.getMonth() + 1
+          ).padStart(2, "0")}`;
+          console.log("載入留言，月份:", monthKey);
 
           const messagesRef = collection(db, "messages");
           const q = query(messagesRef, where("monthKey", "==", monthKey));
@@ -890,8 +916,10 @@
 
           // 按時間排序（最新的在前面）
           messagesData.sort((a, b) => {
-            const timeA = a.timestamp?.seconds || a.timestamp?.getTime() / 1000 || 0;
-            const timeB = b.timestamp?.seconds || b.timestamp?.getTime() / 1000 || 0;
+            const timeA =
+              a.timestamp?.seconds || a.timestamp?.getTime() / 1000 || 0;
+            const timeB =
+              b.timestamp?.seconds || b.timestamp?.getTime() / 1000 || 0;
             return timeB - timeA;
           });
 
@@ -907,24 +935,26 @@
       // 渲染留言列表
       function renderMessages() {
         const messageList = document.getElementById("message-list");
-        
+
         // 如果未登入，不顯示任何內容
         if (!currentUser) {
-          messageList.innerHTML = '<div class="no-messages">請先登入以查看留言</div>';
+          messageList.innerHTML =
+            '<div class="no-messages">請先登入以查看留言</div>';
           return;
         }
 
         if (messagesData.length === 0) {
-          messageList.innerHTML = '<div class="no-messages">本月還沒有留言，成為第一個留言的人吧！</div>';
+          messageList.innerHTML =
+            '<div class="no-messages">本月還沒有留言，成為第一個留言的人吧！</div>';
           return;
         }
 
-        let html = '';
-        messagesData.forEach(message => {
+        let html = "";
+        messagesData.forEach((message) => {
           // 處理時間戳記 - 優先顯示編輯時間
           let displayDate;
-          let timeLabel = '';
-          
+          let timeLabel = "";
+
           if (message.editedAt) {
             // 如果有編輯時間，顯示編輯時間
             if (message.editedAt?.seconds) {
@@ -934,7 +964,7 @@
             } else {
               displayDate = new Date();
             }
-            timeLabel = '(已編輯)';
+            timeLabel = "(已編輯)";
           } else {
             // 沒有編輯時間，顯示原始發表時間
             if (message.timestamp?.seconds) {
@@ -946,16 +976,17 @@
             }
           }
 
-          const formattedTime = displayDate.toLocaleString('zh-TW', {
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
+          const formattedTime = displayDate.toLocaleString("zh-TW", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
           });
 
-          const userName = message.userEmail.split('@')[0];
-          const canEdit = userRole === 'admin' || message.userId === currentUser.uid;
-          
+          const userName = message.userEmail.split("@")[0];
+          const canEdit =
+            userRole === "admin" || message.userId === currentUser.uid;
+
           // 為每個使用者產生專屬顏色 - 確保 currentUser 存在
           const userColor = getUserColor(message.userEmail);
           const textColor = getTextColor(userColor);
@@ -965,14 +996,20 @@
             <div class="message-item" style="border-left-color: ${userColor};">
               <div class="message-header">
                 <span class="message-author" style="background-color: ${userColor}; color: ${textColor};">
-                  [${formattedTime}${timeLabel}] ${userName}${isMyMessage ? ' (我)' : ''}：
+                  [${formattedTime}${timeLabel}] ${userName}${
+            isMyMessage ? " (我)" : ""
+          }：
                 </span>
-                ${canEdit ? `
+                ${
+                  canEdit
+                    ? `
                   <div class="message-actions">
                     <button class="message-edit-btn" onclick="editMessage('${message.id}')">編輯</button>
                     <button class="message-delete-btn" onclick="deleteMessage('${message.id}')">刪除</button>
                   </div>
-                ` : ''}
+                `
+                    : ""
+                }
               </div>
               <div class="message-content">${message.content}</div>
             </div>
@@ -983,88 +1020,94 @@
       }
 
       // 發表留言
-      window.submitMessage = async function() {
+      window.submitMessage = async function () {
         // 檢查是否已登入
         if (!currentUser) {
-          alert('請先登入才能發表留言！');
+          alert("請先登入才能發表留言！");
           return;
         }
-        
+
         const messageInput = document.getElementById("message-input");
         const submitButton = document.getElementById("message-submit");
-        
+
         const content = messageInput.value.trim();
-        
+
         if (!content) {
-          alert('請輸入留言內容！');
+          alert("請輸入留言內容！");
           return;
         }
-        
+
         if (content.length > 500) {
-          alert('留言內容不能超過500字！');
+          alert("留言內容不能超過500字！");
           return;
         }
-        
+
         submitButton.disabled = true;
-        submitButton.textContent = '發表中...';
-        
+        submitButton.textContent = "發表中...";
+
         try {
-          const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-          
+          const monthKey = `${currentDate.getFullYear()}-${String(
+            currentDate.getMonth() + 1
+          ).padStart(2, "0")}`;
+
           await addDoc(collection(db, "messages"), {
             content: content,
             userId: currentUser.uid,
             userEmail: currentUser.email,
             monthKey: monthKey,
-            timestamp: new Date()
+            timestamp: new Date(),
           });
-          
-          messageInput.value = '';
+
+          messageInput.value = "";
           updateCharCount();
-          
-          console.log('留言發表成功');
+
+          console.log("留言發表成功");
           setTimeout(loadMessages, 300);
-          
         } catch (error) {
-          console.error('發表留言失敗：', error);
-          alert('發表留言失敗：' + error.message);
+          console.error("發表留言失敗：", error);
+          alert("發表留言失敗：" + error.message);
         } finally {
           submitButton.disabled = false;
-          submitButton.textContent = '發表留言';
+          submitButton.textContent = "發表留言";
         }
       };
 
       // 編輯留言 - 加入更多安全檢查
-      window.editMessage = function(messageId) {
-        console.log('editMessage 被呼叫，messageId:', messageId, 'currentUser:', currentUser);
-        
+      window.editMessage = function (messageId) {
+        console.log(
+          "editMessage 被呼叫，messageId:",
+          messageId,
+          "currentUser:",
+          currentUser
+        );
+
         if (!currentUser) {
-          console.log('使用者未登入，無法編輯留言');
-          alert('請先登入才能編輯留言！');
+          console.log("使用者未登入，無法編輯留言");
+          alert("請先登入才能編輯留言！");
           return;
         }
-        
+
         if (!messageId) {
-          console.log('messageId 無效');
+          console.log("messageId 無效");
           return;
         }
-        
-        const message = messagesData.find(m => m.id === messageId);
+
+        const message = messagesData.find((m) => m.id === messageId);
         if (!message) {
-          console.log('找不到對應的留言');
+          console.log("找不到對應的留言");
           return;
         }
 
         // 檢查權限
-        if (userRole !== 'admin' && message.userId !== currentUser.uid) {
-          alert('您只能編輯自己的留言！');
+        if (userRole !== "admin" && message.userId !== currentUser.uid) {
+          alert("您只能編輯自己的留言！");
           return;
         }
 
         editingMessageId = messageId;
         const editInput = document.getElementById("edit-message-input");
         const modal = document.getElementById("edit-modal");
-        
+
         if (editInput && modal) {
           editInput.value = message.content;
           updateEditCharCount();
@@ -1073,7 +1116,7 @@
       };
 
       // 取消編輯
-      window.cancelEdit = function() {
+      window.cancelEdit = function () {
         editingMessageId = null;
         const modal = document.getElementById("edit-modal");
         if (modal) {
@@ -1082,74 +1125,78 @@
       };
 
       // 儲存編輯
-      window.saveEdit = async function() {
+      window.saveEdit = async function () {
         if (!editingMessageId) return;
 
         const editInput = document.getElementById("edit-message-input");
         const content = editInput.value.trim();
 
         if (!content) {
-          alert('請輸入留言內容！');
+          alert("請輸入留言內容！");
           return;
         }
 
         if (content.length > 500) {
-          alert('留言內容不能超過500字！');
+          alert("留言內容不能超過500字！");
           return;
         }
 
         try {
           await updateDoc(doc(db, "messages", editingMessageId), {
             content: content,
-            editedAt: new Date()
+            editedAt: new Date(),
           });
 
-          console.log('留言編輯成功');
+          console.log("留言編輯成功");
           cancelEdit();
           setTimeout(loadMessages, 300);
-
         } catch (error) {
-          console.error('編輯留言失敗：', error);
-          alert('編輯留言失敗：' + error.message);
+          console.error("編輯留言失敗：", error);
+          alert("編輯留言失敗：" + error.message);
         }
       };
 
       // 刪除留言 - 加入更多安全檢查
-      window.deleteMessage = async function(messageId) {
-        console.log('deleteMessage 被呼叫，messageId:', messageId, 'currentUser:', currentUser);
-        
+      window.deleteMessage = async function (messageId) {
+        console.log(
+          "deleteMessage 被呼叫，messageId:",
+          messageId,
+          "currentUser:",
+          currentUser
+        );
+
         if (!currentUser) {
-          console.log('使用者未登入，無法刪除留言');
-          alert('請先登入才能刪除留言！');
+          console.log("使用者未登入，無法刪除留言");
+          alert("請先登入才能刪除留言！");
           return;
         }
-        
+
         if (!messageId) {
-          console.log('messageId 無效');
+          console.log("messageId 無效");
           return;
         }
-        
-        const message = messagesData.find(m => m.id === messageId);
+
+        const message = messagesData.find((m) => m.id === messageId);
         if (!message) {
-          console.log('找不到對應的留言');
+          console.log("找不到對應的留言");
           return;
         }
 
         // 檢查權限
-        if (userRole !== 'admin' && message.userId !== currentUser.uid) {
-          alert('您只能刪除自己的留言！');
+        if (userRole !== "admin" && message.userId !== currentUser.uid) {
+          alert("您只能刪除自己的留言！");
           return;
         }
 
-        const userName = message.userEmail.split('@')[0];
+        const userName = message.userEmail.split("@")[0];
         if (confirm(`確定要刪除 ${userName} 的留言嗎？`)) {
           try {
             await deleteDoc(doc(db, "messages", messageId));
-            console.log('留言刪除成功');
+            console.log("留言刪除成功");
             setTimeout(loadMessages, 300);
           } catch (error) {
-            console.error('刪除留言失敗：', error);
-            alert('刪除留言失敗：' + error.message);
+            console.error("刪除留言失敗：", error);
+            alert("刪除留言失敗：" + error.message);
           }
         }
       };
@@ -1159,9 +1206,9 @@
         const input = document.getElementById("message-input");
         const counter = document.getElementById("char-count");
         const length = input.value.length;
-        
+
         counter.textContent = `${length}/500`;
-        
+
         counter.className = "char-count";
         if (length > 450) {
           counter.classList.add("danger");
@@ -1175,9 +1222,9 @@
         const input = document.getElementById("edit-message-input");
         const counter = document.getElementById("edit-char-count");
         const length = input.value.length;
-        
+
         counter.textContent = `${length}/500`;
-        
+
         counter.className = "char-count";
         if (length > 450) {
           counter.classList.add("danger");
@@ -1187,16 +1234,16 @@
       }
 
       // 綁定輸入事件
-      document.addEventListener('DOMContentLoaded', function() {
+      document.addEventListener("DOMContentLoaded", function () {
         const messageInput = document.getElementById("message-input");
         const editInput = document.getElementById("edit-message-input");
-        
+
         if (messageInput) {
-          messageInput.addEventListener('input', updateCharCount);
+          messageInput.addEventListener("input", updateCharCount);
         }
-        
+
         if (editInput) {
-          editInput.addEventListener('input', updateEditCharCount);
+          editInput.addEventListener("input", updateEditCharCount);
         }
       });
 
@@ -1285,7 +1332,7 @@
             if (dayShift) {
               const userName = dayShift.userEmail.split("@")[0];
               shiftInfo.textContent = userName;
-              
+
               if (currentUser && dayShift.userId === currentUser.uid) {
                 // 我的班次：保持綠色
                 dayElement.classList.add("my-shift");
@@ -1294,7 +1341,7 @@
                 dayElement.classList.add("user-shift");
                 const userColor = getUserColor(dayShift.userEmail);
                 const textColor = getTextColor(userColor);
-                
+
                 dayElement.style.backgroundColor = userColor;
                 dayElement.style.color = textColor;
                 dayElement.style.borderColor = textColor;
