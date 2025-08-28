@@ -615,20 +615,39 @@
 
       // 為使用者產生固定顏色的函數
       function getUserColor(email) {
-        // 根據 email 產生一個固定的 hash 值
-        let hash = 0;
-        for (let i = 0; i < email.length; i++) {
-          hash = email.charCodeAt(i) + ((hash << 5) - hash);
-          hash = hash & hash;
-        }
+  // 針對主要用戶特別設計顏色，確保最大對比
+  const manualOverrides = {
+    'ymwymwymw@gmail.com': 'hsl(120, 50%, 80%)',    // 明顯綠色
+    'spider.beef@gmail.com': 'hsl(220, 60%, 90%)',   // 明顯藍色  
+    'jmwmch@gmail.com': 'hsl(60, 60%, 80%)'         // 明顯黃色
+  };
+  
+  // 先檢查是否為主要用戶
+  if (manualOverrides[email]) {
+    return manualOverrides[email];
+  }
 
-        // 使用 HSL 色彩空間產生顏色，確保顏色鮮明且可讀
-        const hue = Math.abs(hash) % 360;
-        const saturation = 70; // 飽和度固定，避免過淡的顏色
-        const lightness = 85; // 亮度固定，確保背景色不會太深
+  // 其他用戶使用一般顏色陣列
+  const predefinedColors = [
+    'hsl(45, 90%, 70%)',   // 橙黃色
+    'hsl(270, 75%, 85%)',  // 紫色
+    'hsl(30, 85%, 75%)',   // 橙色
+    'hsl(180, 70%, 80%)',  // 青色
+    'hsl(300, 80%, 80%)',  // 粉紫色
+    'hsl(90, 65%, 75%)'    // 黃綠色
+  ];
 
-        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      }
+  // 根據 email 產生一個固定的 hash 值
+  let hash = 0;
+  for (let i = 0; i < email.length; i++) {
+    hash = email.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+
+  const colorIndex = Math.abs(hash) % predefinedColors.length;
+  return predefinedColors[colorIndex];
+}
+
 
       // 計算文字顏色（根據背景顏色自動選擇深色或淺色文字）
       function getTextColor(backgroundColor) {
@@ -1328,26 +1347,49 @@
             // 檢查這一天是否有班次
             const dateStr = date.toISOString().split("T")[0];
             const dayShift = shiftsData.find((shift) => shift.date === dateStr);
-
+            // 檢查是否為週末
+            const isWeekend = (day === 5 || day === 6); // 週六、週日
             if (dayShift) {
               const userName = dayShift.userEmail.split("@")[0];
               shiftInfo.textContent = userName;
-
+            
               if (currentUser && dayShift.userId === currentUser.uid) {
-                // 我的班次：保持綠色
-                dayElement.classList.add("my-shift");
+                // 我的班次
+                if (isWeekend) {
+                  // 週末的我的班次：使用漸層或邊框區別
+                  dayElement.classList.add("my-shift", "weekend");
+                  dayElement.style.background = "linear-gradient(135deg, #c8e6c9 0%, #e3f2fd 100%)";
+                  dayElement.style.border = "3px solid #2196f3";
+                } else {
+                  dayElement.classList.add("my-shift");
+                }
               } else {
-                // 其他人的班次：使用個人專屬顏色
+                // 其他人的班次
                 dayElement.classList.add("user-shift");
                 const userColor = getUserColor(dayShift.userEmail);
                 const textColor = getTextColor(userColor);
 
-                dayElement.style.backgroundColor = userColor;
+                if (isWeekend) {
+                  // 週末的其他人班次：使用漸層背景
+                  const weekendColor = "#e3f2fd"; // 淺藍色
+                  dayElement.style.background = `linear-gradient(135deg, ${userColor} 0%, ${weekendColor} 100%)`;
+                  dayElement.style.border = "3px solid #2196f3";
+                } else {
+                  dayElement.style.backgroundColor = userColor;
+                }
+    
                 dayElement.style.color = textColor;
                 dayElement.style.borderColor = textColor;
               }
+            } else {
+              // 沒有班次的日子
+              if (isWeekend) {
+                dayElement.style.backgroundColor = "#f0f8ff";
+                dayElement.style.border = "2px solid #bbdefb";
+              }
             }
 
+           
             // 如果不是當前月份，設為灰色
             if (date.getMonth() !== currentDate.getMonth()) {
               dayElement.style.opacity = "0.3";
